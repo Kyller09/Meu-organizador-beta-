@@ -10,24 +10,6 @@ Funciona offline, sem login, sem servidor externo e sem dependências (não há 
 3. Clique com o botão direito em `index.html` → **Open with Live Server** (porta padrão 5500).
 4. No navegador, F12 → ícone de celular para ver em tamanho de telefone.
 
-## Como instalar no Android
-
-**Opção A: cabo USB (recomendada, já é endereço seguro)**
-
-1. No celular: Configurações → Opções do desenvolvedor → ative **Depuração USB**.
-2. Conecte o cabo e autorize o computador no celular.
-3. No terminal do VS Code: `adb devices` (deve listar o aparelho) e depois `adb reverse tcp:5500 tcp:5500`.
-4. Com o Live Server rodando, abra o **Chrome do celular** em `http://localhost:5500`.
-5. Menu ⋮ do Chrome → **Instalar app** (ou "Adicionar à tela inicial").
-6. Abra o app uma vez com o servidor ligado, para o Service Worker guardar os arquivos. Depois disso o
-   servidor pode ser desligado: o app abre offline.
-
-> `localhost` conta como endereço seguro, por isso o Service Worker, o PIN e as notificações funcionam.
-> Abrir por `http://192.168.x.x:5500` (Wi-Fi) **não** é seguro: o app abre, mas sem offline, sem PIN e sem notificações.
-
-**Opção B: hospedar de graça (HTTPS)** em GitHub Pages, Netlify etc. Só os arquivos estáticos da pasta,
-sem dados pessoais (os dados ficam no celular, nunca no servidor).
-
 ## Mapa do código
 
 | Arquivo | Responsabilidade |
