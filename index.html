@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <!-- Codificação de caracteres: permite acentos (ç, ã, é...) -->
+  <meta charset="UTF-8" />
+
+  <!-- Viewport: faz a página se ajustar à largura do celular.
+       Sem esta linha, o celular mostraria a página "encolhida" como se fosse um desktop. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <!-- Cor da barra do navegador no celular (combina com o fundo do app) -->
+  <meta name="theme-color" content="#0D111B" />
+  <meta name="description" content="Meu Organizador: gastos, parcelas e agenda, offline." />
+
+  <title>Meu Organizador</title>
+
+  <!-- PWA: o manifest descreve como instalar o app; os ícones aparecem na tela inicial -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+
+  <!-- Nosso arquivo de estilos -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <!-- ============ CABEÇALHO ============ -->
+  <header class="topbar">
+    <div>
+      <p class="topbar__hello" id="data-hoje">--</p>
+      <h1 class="topbar__title">Meu Organizador</h1>
+    </div>
+    <button class="icone-btn" id="btn-ajustes" type="button" aria-label="Ajustes">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+  </header>
+
+  <!-- ============ CONTEÚDO ============
+       Cada <section class="tela"> é uma "tela" do app.
+       Só uma fica visível por vez; o app.js troca qual está ativa.
+       O conteúdo das listas é desenhado pelos arquivos em js/views/. -->
+  <main class="conteudo">
+
+    <!-- ---------- TELA: INÍCIO (Dashboard) ---------- -->
+    <section class="tela tela--ativa" id="tela-inicio" aria-label="Início">
+
+      <!-- Avisos: lembretes de compromissos e lembrete de backup -->
+      <div id="lembretes-area"></div>
+
+      <!-- Cartão principal: gastos do mês -->
+      <article class="card card--destaque">
+        <p class="card__rotulo">Gastos em <span id="mes-atual">este mês</span></p>
+        <p class="card__valor-grande" id="total-gastos-mes">R$ 0,00</p>
+        <p class="card__nota" id="nota-gastos-mes">Nenhuma despesa registrada ainda</p>
+        <p class="card__comparacao" id="comparacao-mes"></p>
+      </article>
+
+      <!-- Cartões menores: prestações e compromissos -->
+      <div class="grade-2">
+        <article class="card">
+          <p class="card__rotulo">Prestações pendentes</p>
+          <p class="card__valor-medio card__valor-medio--amarelo" id="qtd-prestacoes">0</p>
+          <p class="card__nota" id="nota-prestacoes">Nenhuma parcela em aberto</p>
+        </article>
+
+        <article class="card">
+          <p class="card__rotulo">Compromissos (7 dias)</p>
+          <p class="card__valor-medio card__valor-medio--verde" id="qtd-compromissos">0</p>
+          <p class="card__nota" id="nota-compromissos">Nada agendado</p>
+        </article>
+      </div>
+
+      <!-- Acesso rápido: data-ir-para = tela de destino; data-foco = campo que recebe o cursor -->
+      <h2 class="secao-titulo">Acesso rápido</h2>
+      <div class="grade-3">
+        <button class="atalho" data-ir-para="gastos" data-foco="gasto-descricao" type="button">
+          <span class="atalho__icone">＋</span>
+          <span>Novo gasto</span>
+        </button>
+        <button class="atalho" data-ir-para="parcelas" data-foco="parcela-descricao" type="button">
+          <span class="atalho__icone">▤</span>
+          <span>Nova parcela</span>
+        </button>
+        <button class="atalho" data-ir-para="agenda" data-foco="evento-titulo" type="button">
+          <span class="atalho__icone">◷</span>
+          <span>Compromisso</span>
+        </button>
+      </div>
+
+      <!-- Gráficos -->
+      <h2 class="secao-titulo">Gastos por categoria</h2>
+      <article class="card" id="grafico-categorias"></article>
+
+      <h2 class="secao-titulo">Últimos 6 meses</h2>
+      <article class="card" id="grafico-meses"></article>
+
+      <!-- Histórico resumido -->
+      <h2 class="secao-titulo">Últimos lançamentos</h2>
+      <article class="card">
+        <ul class="lista" id="lista-recentes">
+          <li class="lista__vazio">Seus lançamentos recentes vão aparecer aqui.</li>
+        </ul>
+      </article>
+    </section>
+
+    <!-- ---------- TELA: GASTOS ---------- -->
+    <section class="tela" id="tela-gastos" aria-label="Gastos">
+      <h2 class="tela__titulo">Gastos</h2>
+
+      <div class="seletor-mes">
+        <button class="icone-btn" id="gastos-mes-anterior" type="button" aria-label="Mês anterior">‹</button>
+        <strong id="gastos-mes-rotulo">--</strong>
+        <button class="icone-btn" id="gastos-mes-proximo" type="button" aria-label="Próximo mês">›</button>
+      </div>
+
+      <article class="card card--destaque">
+        <p class="card__rotulo">Total do mês</p>
+        <p class="card__valor-grande" id="gastos-total">R$ 0,00</p>
+        <p class="card__nota" id="gastos-nota"></p>
+      </article>
+
+      <h3 class="secao-titulo" id="gasto-form-titulo">Novo gasto</h3>
+      <form class="card form" id="form-gasto" autocomplete="off" novalidate>
+        <label class="campo">
+          <span>Descrição</span>
+          <input id="gasto-descricao" type="text" maxlength="80" placeholder="Ex.: Almoço" />
+        </label>
+        <div class="linha-2">
+          <label class="campo">
+            <span>Valor (R$)</span>
+            <input id="gasto-valor" type="text" inputmode="decimal" placeholder="0,00" />
+          </label>
+          <label class="campo">
+            <span>Data</span>
+            <input id="gasto-data" type="date" />
+          </label>
+        </div>
+        <label class="campo">
+          <span>Categoria</span>
+          <select id="gasto-categoria"></select>
+        </label>
+        <p class="form__erro" id="gasto-erro" role="alert" hidden></p>
+        <div class="form__acoes">
+          <button class="btn btn--primario" type="submit" id="gasto-salvar">Adicionar gasto</button>
+          <button class="btn" type="button" id="gasto-cancelar" hidden>Cancelar</button>
+        </div>
+      </form>
+
+      <h3 class="secao-titulo">Histórico do mês</h3>
+      <label class="campo campo--filtro">
+        <span>Filtrar por categoria</span>
+        <select id="gasto-filtro"></select>
+      </label>
+      <article class="card">
+        <ul class="lista" id="lista-gastos"></ul>
+      </article>
+    </section>
+
+    <!-- ---------- TELA: PARCELAS ---------- -->
+    <section class="tela" id="tela-parcelas" aria-label="Parcelas">
+      <h2 class="tela__titulo">Parcelas</h2>
+
+      <article class="card card--destaque">
+        <p class="card__rotulo">Ainda a pagar</p>
+        <p class="card__valor-grande card__valor-grande--amarelo" id="parcelas-total-pendente">R$ 0,00</p>
+        <p class="card__nota" id="parcelas-nota"></p>
+      </article>
+
+      <h3 class="secao-titulo">Nova compra parcelada</h3>
+      <form class="card form" id="form-parcela" autocomplete="off" novalidate>
+        <label class="campo">
+          <span>Nome da compra</span>
+          <input id="parcela-descricao" type="text" maxlength="80" placeholder="Ex.: Celular novo" />
+        </label>
+        <div class="linha-2">
+          <label class="campo">
+            <span>Valor total (R$)</span>
+            <input id="parcela-valor" type="text" inputmode="decimal" placeholder="0,00" />
+          </label>
+          <label class="campo">
+            <span>Nº de parcelas</span>
+            <input id="parcela-qtd" type="number" inputmode="numeric" min="1" max="120" placeholder="Ex.: 12" />
+          </label>
+        </div>
+        <div class="linha-2">
+          <label class="campo">
+            <span>Data da compra</span>
+            <input id="parcela-compra" type="date" />
+          </label>
+          <label class="campo">
+            <span>1º vencimento</span>
+            <input id="parcela-vencimento" type="date" />
+          </label>
+        </div>
+        <label class="campo">
+          <span>Categoria</span>
+          <select id="parcela-categoria"></select>
+        </label>
+        <p class="form__dica" id="parcela-previa"></p>
+        <p class="form__erro" id="parcela-erro" role="alert" hidden></p>
+        <div class="form__acoes">
+          <button class="btn btn--primario" type="submit">Cadastrar compra</button>
+        </div>
+      </form>
+
+      <div id="bloco-atrasadas" hidden>
+        <h3 class="secao-titulo secao-titulo--alerta">Atrasadas</h3>
+        <article class="card"><ul class="lista" id="lista-atrasadas"></ul></article>
+      </div>
+
+      <h3 class="secao-titulo">Próximas parcelas</h3>
+      <article class="card"><ul class="lista" id="lista-proximas"></ul></article>
+
+      <h3 class="secao-titulo">Compras parceladas</h3>
+      <div id="lista-compras"></div>
+    </section>
+
+    <!-- ---------- TELA: AGENDA ---------- -->
+    <section class="tela" id="tela-agenda" aria-label="Agenda">
+      <h2 class="tela__titulo">Agenda</h2>
+
+      <form class="card form" id="form-evento" autocomplete="off" novalidate>
+        <h3 class="form__titulo" id="evento-form-titulo">Novo compromisso</h3>
+        <label class="campo">
+          <span>Título</span>
+          <input id="evento-titulo" type="text" maxlength="80" placeholder="Ex.: Consulta" />
+        </label>
+        <label class="campo">
+          <span>Descrição (opcional)</span>
+          <textarea id="evento-descricao" rows="2" maxlength="300"></textarea>
+        </label>
+        <div class="linha-2">
+          <label class="campo">
+            <span>Data</span>
+            <input id="evento-data" type="date" />
+          </label>
+          <label class="campo">
+            <span>Hora</span>
+            <input id="evento-hora" type="time" />
+          </label>
+        </div>
+        <label class="campo">
+          <span>Lembrete</span>
+          <select id="evento-lembrete"></select>
+        </label>
+        <p class="form__erro" id="evento-erro" role="alert" hidden></p>
+        <div class="form__acoes">
+          <button class="btn btn--primario" type="submit" id="evento-salvar">Adicionar compromisso</button>
+          <button class="btn" type="button" id="evento-cancelar" hidden>Cancelar</button>
+        </div>
+      </form>
+
+      <article class="card card--aviso" id="aviso-notificacoes">
+        <p class="card__nota" id="texto-notificacoes"></p>
+        <button class="btn" type="button" id="btn-notificacoes" hidden>Ativar notificações</button>
+      </article>
+
+      <h3 class="secao-titulo">Próximos compromissos</h3>
+      <div id="lista-proximos"></div>
+
+      <details class="card compra" id="bloco-passados">
+        <summary id="resumo-passados">Passados</summary>
+        <ul class="lista" id="lista-passados"></ul>
+      </details>
+    </section>
+
+    <!-- ---------- TELA: AJUSTES ---------- -->
+    <section class="tela" id="tela-ajustes" aria-label="Ajustes">
+      <h2 class="tela__titulo">Ajustes</h2>
+
+      <h3 class="secao-titulo">Backup dos dados</h3>
+      <article class="card form">
+        <p class="card__nota">
+          Seus dados ficam só neste aparelho. Limpar os dados do navegador ou trocar de celular
+          apaga tudo — por isso, guarde um backup.
+        </p>
+        <p class="card__nota" id="info-backup"></p>
+        <div class="form__acoes">
+          <button class="btn btn--primario" type="button" id="btn-exportar">Exportar backup</button>
+          <button class="btn" type="button" id="btn-importar">Restaurar backup</button>
+        </div>
+        <input type="file" id="arquivo-importar" accept=".json,application/json" hidden />
+      </article>
+
+      <h3 class="secao-titulo">Armazenamento</h3>
+      <article class="card form">
+        <p class="card__nota" id="status-armazenamento"></p>
+        <div class="form__acoes">
+          <button class="btn" type="button" id="btn-persistir" hidden>Proteger contra limpeza automática</button>
+        </div>
+      </article>
+
+      <h3 class="secao-titulo">Bloqueio por PIN</h3>
+      <form class="card form" id="form-pin" autocomplete="off" novalidate>
+        <p class="card__nota" id="status-pin"></p>
+        <label class="campo" id="campo-pin-atual" hidden>
+          <span>PIN atual</span>
+          <input id="pin-atual" type="password" inputmode="numeric" maxlength="6" autocomplete="off" />
+        </label>
+        <label class="campo">
+          <span>Novo PIN (4 a 6 números)</span>
+          <input id="pin-novo" type="password" inputmode="numeric" maxlength="6" autocomplete="off" />
+        </label>
+        <label class="campo">
+          <span>Repita o novo PIN</span>
+          <input id="pin-confirmar" type="password" inputmode="numeric" maxlength="6" autocomplete="off" />
+        </label>
+        <p class="form__erro" id="pin-erro" role="alert" hidden></p>
+        <div class="form__acoes">
+          <button class="btn btn--primario" type="submit" id="pin-salvar">Ativar PIN</button>
+          <button class="btn" type="button" id="btn-bloquear-agora" hidden>Bloquear agora</button>
+          <button class="btn btn--perigo" type="button" id="pin-remover" hidden>Remover PIN</button>
+        </div>
+      </form>
+
+      <h3 class="secao-titulo">Sobre</h3>
+      <article class="card">
+        <p class="card__nota">
+          Meu Organizador · versão 1.0 · funciona offline, sem conta e sem servidor.
+          O bloqueio por PIN é uma tranca de tela: não criptografa os dados.
+        </p>
+      </article>
+    </section>
+  </main>
+
+  <!-- ============ MENU INFERIOR ============
+       Cada botão tem data-tela="nome". O app.js usa esse nome
+       para saber qual <section id="tela-nome"> mostrar. -->
+  <nav class="menu" aria-label="Navegação principal">
+    <button class="menu__item menu__item--ativo" data-tela="inicio" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+      <span>Início</span>
+    </button>
+    <button class="menu__item" data-tela="gastos" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 10h18M16 14.5h2"/></svg>
+      <span>Gastos</span>
+    </button>
+    <button class="menu__item" data-tela="parcelas" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      <span>Parcelas</span>
+    </button>
+    <button class="menu__item" data-tela="agenda" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM4 10h16M9 3v4M15 3v4"/></svg>
+      <span>Agenda</span>
+    </button>
+  </nav>
+
+  <!-- ============ AVISOS (toasts) ============ -->
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <!-- ============ DIÁLOGO DE CONFIRMAÇÃO ============
+       Usado por confirmar() em js/ui.js. O texto é preenchido por JavaScript. -->
+  <dialog class="dialogo" id="dialogo-confirmar">
+    <form method="dialog">
+      <h3 id="dialogo-titulo"></h3>
+      <p id="dialogo-mensagem"></p>
+      <div class="form__acoes">
+        <button class="btn" type="submit" value="cancel" id="dialogo-cancelar">Cancelar</button>
+        <button class="btn btn--primario" type="submit" value="ok" id="dialogo-ok">Confirmar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ============ TELA DE BLOQUEIO (PIN) ============
+       Fica escondida (hidden) até o js/security.js mostrá-la. -->
+  <div class="bloqueio" id="tela-bloqueio" hidden>
+    <form class="bloqueio__caixa" id="form-bloqueio" autocomplete="off">
+      <h2>Meu Organizador</h2>
+      <p>Digite seu PIN para continuar</p>
+      <input id="bloqueio-pin" type="password" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="PIN" />
+      <p class="form__erro" id="bloqueio-erro" role="alert" hidden></p>
+      <button class="btn btn--primario" type="submit">Desbloquear</button>
+    </form>
+  </div>
+
+  <!-- type="module" permite usar import/export entre arquivos JS -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
